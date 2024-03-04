@@ -1,0 +1,24 @@
+{% autoescape off %}
+Hi {{user.full_name}},
+
+Welcome to Fingrace Flowers, where delicate blooms meet exquisite artistry! We're so excited to have you join our community of flower lovers.
+
+To unlock your full Fingrace experience and start exploring our vibrant bouquets, exclusive offers, and expert floral tips, please verify your email address by clicking on the fragrant link below:
+
+http://{{domain}}{% url 'activate' uidb64=uid token=token %}
+
+Just imagine:
+
+Effortless ordering: Access our online flower shop with ease, sending fragrant surprises to loved ones with just a few clicks.
+Blooming benefits: Enjoy exclusive deals and discounts on our exquisite floral creations.
+Insider secrets: Learn expert tips and tricks to keep your flowers fresh and your home blooming beautiful.
+Verifying your email is like tending to a delicate bud, ensuring it opens up to its full potential. And like a carefully arranged bouquet, your Fingrace experience will be far more beautiful with you in it.
+
+If you haven't ordered any floral magic from us yet and received this email by mistake, no worries! Simply disregard it, and your garden will remain undisturbed.
+
+We can't wait to welcome you officially to the Fingrace family!
+
+With fragrant wishes,
+
+The Fingrace Flowers Team
+{% endautoescape %}

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <!-- Header Area End Here -->
+    <!-- Breadcrumb Area Start Here -->
+    <div class="breadcrumbs-area position-relative">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div class="breadcrumb-content position-relative section-content">
+                        <h3 class="title-3">Shopping Cart</h3>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li>Shopping Cart</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb Area End Here -->
+    <!-- cart main wrapper start -->
+    <div class="cart-main-wrapper mt-no-text">
+        <div class="container custom-area">
+            <div class="row">
+                <div class="col-lg-12 col-custom">
+                    <!-- Cart Table Area -->
+                    {% include 'alerts.html' %}
+                    {% if cart_items %}
+                    <div class="cart-table table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="pro-thumbnail">Image</th>
+                                    <th class="pro-title">Product</th>
+                                    <th class="pro-price">Price</th>
+                                    <th class="pro-quantity">Quantity</th>
+                                    <th class="pro-subtotal">Total</th>
+                                    <th class="pro-remove">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for abc in cart_items %}
+                                <!--<tr data-product-id="{{ abc.id }}">-->
+                                <tr data-cart-item-id="{{ abc.id }}" data-product-id="{{ abc.id }}" data-stock-quantity="{% if abc.variations %}{{abc.variations.quantity}}{% else %}{{abc.product.stock}}{% endif %}" data-price="{% if abc.variations.discount_price %}{{ abc.variations.discount_price }}{% elif abc.product.discount_price %}{{ abc.product.discount_price }}{% else %}{{ abc.product.price }}{% endif %}"> 
+                                    {% if abc.product.productimage_thumbnail_set.first %}
+                                        <td class="pro-thumbnail"><a href="#"><img class="img-fluid" src="{{ abc.product.productimage_thumbnail_set.first.product_image.url }}" alt="Product" /></a></td>
+                                    {% else %}
+                                        <td class="pro-thumbnail">No image available</td>
+                                    {% endif %}
+                                    <td class="pro-title">
+                                        <a class='productname' href="#">
+                                            {{ abc.product.product_name }}
+                                            {% if abc.variations %}
+                                                <br>
+                                                {% for variation_name in abc.variations.variation_name.all %}
+                                                    {{ variation_name.name }}
+                                                    {% for variation_value in abc.variations.variation_value.all %}
+                                                        {% if variation_value.variation_attribute.id == variation_name.id %}
+                                                            | {{ variation_value.value }}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    <br>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </a>
+                                    </td>
+                                    <td class="pro-price">
+                                        <span>RM
+                                            {% if abc.variations %}
+                                                {% if abc.variations.discount_price %}
+                                                    {{abc.variations.discount_price}}
+                                                {% else %}
+                                                    {{abc.variations.price}}
+                                                {% endif %}
+                                            {% else %}
+                                                {% if abc.product.discount_price %}
+                                                    {{abc.product.discount_price}}
+                                                {% else %}
+                                                    {{abc.product.price}}
+                                                {% endif %}
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="pro-quantity">
+                                        <div class="quantity">
+                                            <div class="cart-plus-minus">
+                                                {% comment %} <div class="dec qtybutton">
+                                                  <form id="cartForm1" method="POST" action="{% url 'remove_cart' abc.product.id abc.id %}">
+                                                    {% csrf_token %}
+                                                    <button style="border: none; background: none; padding: 0;" type="button" class="qtybutton dec"><i class="fa fa-minus"></i></button>
+                                                  </form>
+                                                </div> {% endcomment %}
+                                                <input id="input1" class="cart-plus-minus-box" value="{{ abc.quantity }}" type="number">
+                                                <div class="dec qtybutton"><i class="fa fa-minus"></i></div>
+                                                <div class="inc qtybutton"><i class="fa fa-plus"></i></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="pro-subtotal"><span class='item-subtotal'>RM {{abc.sub_total}}</span></td>
+                                    <td id="delete1" class="pro-remove"><a href="#"><i class="lnr lnr-trash"></i></a></td>
+                                    <div id="cart-alert1" class="cart-alert1" style="display:none;">
+                                        <p></p>
+                                    </div>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Cart Update Option -->
+                    <div class="cart-update-option" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="apply-coupon-wrapper" style="flex: 1; min-width: 0; max-width: 400px;"> <!-- Use flex instead of flex-grow -->
+                            <form method="post" class="d-block d-md-flex" style="display: flex;">
+                                <input id='couponinput' type="text" placeholder="Enter Your Coupon Code" required style="flex: 1; margin-right: 10px;"/>
+                                <button id='couponbutton' class="btn flosun-button primary-btn rounded-0 black-btn">Apply Coupon</button>
+                                {% csrf_token %}
+                            </form>
+                        </div>
+                        <div style="margin-left: 10px; max-width: 700px;"> <!-- Set a max width for the text span container -->
+                            <span id='couponmessage' style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-5 ml-auto col-custom">
+                    <!-- Cart Calculation Area -->
+                    <div class="cart-calculator-wrapper">
+                        <div class="cart-calculate-items">
+                            <h3>Cart Totals</h3>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tr>
+                                        <td>Sub Total</td>
+                                        <td class="price-container"><span class="currency-symbol">RM</span><span id='grand_total_price' class="currency-amount subtotal-amount">{{ total|floatformat:2 }}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Discount
+                                            {% comment %} <span class="discount-info-sticker" data-toggle="tooltip" data-placement="right" title="Discounts are calculated based on applicable products and variations. Not all items may qualify for discounts.">?</span> {% endcomment %}
+                                            <span class="discount-popover-trigger hidden-popover-trigger" tabindex="0" role="button" data-bs-trigger="focus" data-bs-toggle="popover" data-bs-placement="right" title="Discount Information" data-bs-html="true" data-bs-content="">
+                                                ?
+                                            </span>
+                                        </td>
+                                        <td class="price-container"><span class="currency-symbol">RM</span><span id='discountprice' class="currency-amount">0.00</span></td>
+                                        {% comment %} <span data-bs-toggle="tooltip" data-bs-placement="right" data-bs-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>Sed <br>id lectus ut sapien consectetur." title="Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>Sed id lectus ut sapien consectetur.">?</span> {% endcomment %}
+                                        {% comment %} <span tabindex="0" role="button" data-bs-trigger="focus" data-bs-toggle="popover" data-bs-placement="right" title="Discount Information" data-bs-html="true" data-bs-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>Sed <br>id lectus ut sapien consectetur.">
+                                            ?
+                                        </span> {% endcomment %}
+                                    </tr>
+                                    <tr>
+                                        <td>Shipping Fees</td>
+                                        <td class="price-container"><span class="currency-symbol">RM</span><span id='shipping1' class="currency-amount">{{shipping_fees|floatformat:2}}</span></td>
+                                    </tr>
+                                    
+                                    <tr class="total">
+                                        <td>Total Amount</td>
+                                        <td class="total-amount price-container"><span class="currency-symbol">RM</span><span class="currency-amount">{{grand_total|floatformat:2}}</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <a href="checkout.html" class="btn flosun-button primary-btn rounded-0 black-btn w-100">Proceed To Checkout</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-cart-message" style="text-align: center; padding: 20px;">
+                <p>There are no items in this cart.</p>
+                <a href="{% url 'home' %}" class="btn flosun-button primary-btn rounded-0 black-btn">Continue Shopping</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <!-- cart main wrapper end -->
+
+{% endblock content %}
